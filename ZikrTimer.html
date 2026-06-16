@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zikr Timer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .container {
+            max-width: 500px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .display-section {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 15px;
+        }
+        .display-block {
+            flex: 1;
+        }
+        .label {
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+        }
+        .time-display {
+            font-size: 32px;
+            font-weight: bold;
+            color: green;
+            margin-top: 5px;
+        }
+        .control-panel {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+        .control-panel button {
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: white;
+        }
+        .btn-start { background-color: green; }
+        .btn-pause { background-color: orange; }
+        .btn-reset { background-color: red; }
+        .btn-reset:disabled { background-color: #ffcccc; cursor: not-allowed; }
+        .settings-section {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+        .settings-group {
+            flex: 1;
+        }
+        .settings-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        .flex-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        .btn-sub-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .btn-sub-group button {
+            width: 35px;
+            height: 35px;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 2px;
+            cursor: pointer;
+        }
+        .btn-label {
+            font-size: 12px;
+            margin: 4px 0;
+        }
+        .btn-val {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+        .duration-display {
+            margin-top: 25px;
+            font-size: 18px;
+            font-weight: bold;
+            color: blue;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">Zikr Timer</div>
+
+    <div class="display-section">
+        <div class="display-block">
+            <div class="label">Level</div>
+            <div id="ongoingLevel" class="time-display">00</div>
+        </div>
+        <div class="display-block">
+            <div class="label">Timer Time</div>
+            <div id="timerTime" class="time-display">00:00:00</div>
+        </div>
+    </div>
+
+    <div class="control-panel">
+        <button class="btn-start" onclick="startTimer()">Start</button>
+        <button class="btn-pause" onclick="pauseTimer()">Pause</button>
+        <button class="btn-reset" id="resetBtn" onclick="resetTimer()">Reset</button>
+    </div>
+
+    <div class="settings-section">
+        <div class="settings-group">
+            <div class="settings-title">Time Interval</div>
+            <div class="flex-buttons">
+                <div class="btn-sub-group">
+                    <button onclick="changeVal('min', 1)">+</button>
+                    <div class="btn-label">min</div>
+                    <button onclick="changeVal('min', -1)">-</button>
+                    <div id="valMin" class="btn-val">03</div>
+                </div>
+                <div class="btn-sub-group">
+                    <button onclick="changeVal('sec', 1)">+</button>
+                    <div class="btn-label">sec</div>
+                    <button onclick="changeVal('sec', -1)">-</button>
+                    <div id="valSec" class="btn-val">13</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-group">
+            <div class="settings-title">Levels</div>
+            <div class="flex-buttons">
+                <div class="btn-sub-group">
+                    <button onclick="changeVal('lev', 1)">+</button>
+                    <div class="btn-label">count</div>
+                    <button onclick="changeVal('lev', -1)">-</button>
+                    <div id="valLev" class="btn-val">14</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="timerDuration" class="duration-display">Timer Duration 00:00:00</div>
+</div>
+
+<script>
+    // Configuration values
+    let intervalMin = 3;
+    let intervalSec = 13;
+    let targetLevels = 14;
+
+    // State values
+    let timerRunning = false;
+    let totalElapsedSeconds = 0;
+    let currentLevel = 0;
+    let intervalTimer = null;
+
+    // Audio Context Setup
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+
+    function playBeep(count) {
+        if (!audioCtx) audioCtx = new AudioContext();
+        let delay = 0;
+        for (let i = 0; i < count; i++) {
+            setTimeout(() => {
+                let osc = audioCtx.createOscillator();
+                let gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, audioCtx.currentTime); 
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.15);
+            }, delay);
+            delay += 300; 
+        }
+    }
+
+    function formatTwoDigits(num) {
+        return num.toString().padStart(2, '0');
+    }
+
+    function formatTime(totalSeconds) {
+        let hrs = Math.floor(totalSeconds / 3600);
+        let mins = Math.floor((totalSeconds % 3600) / 60);
+        let secs = totalSeconds % 60;
+        return `${formatTwoDigits(hrs)}:${formatTwoDigits(mins)}:${formatTwoDigits(secs)}`;
+    }
+
+    function calculateDuration() {
+        let singleIntervalSeconds = (intervalMin * 60) + intervalSec;
+        let totalDurationSeconds = singleIntervalSeconds * targetLevels;
+        document.getElementById('timerDuration').innerText = "Timer Duration " + formatTime(totalDurationSeconds);
+    }
+
+    function updateSettingsDisplay() {
+        document.getElementById('valMin').innerText = formatTwoDigits(intervalMin);
+        document.getElementById('valSec').innerText = formatTwoDigits(intervalSec);
+        document.getElementById('valLev').innerText = formatTwoDigits(targetLevels);
+        calculateDuration();
+    }
+
+    function changeVal(type, amount) {
+        if (timerRunning) return; 
+        if (type === 'min') {
+            intervalMin = Math.max(0, intervalMin + amount);
+        } else if (type === 'sec') {
+            intervalSec = intervalSec + amount;
+            if (intervalSec > 59) intervalSec = 0;
+            if (intervalSec < 0) intervalSec = 59;
+        } else if (type === 'lev') {
+            targetLevels = Math.max(1, targetLevels + amount);
+        }
+        updateSettingsDisplay();
+    }
+
+    function startTimer() {
+        if (timerRunning) return;
+        if ((intervalMin * 60 + intervalSec) === 0) return;
+
+        timerRunning = true;
+        document.getElementById('resetBtn').disabled = true;
+
+        if (currentLevel === 0) currentLevel = 1;
+        document.getElementById('ongoingLevel').innerText = formatTwoDigits(currentLevel);
+
+        intervalTimer = setInterval(() => {
+            totalElapsedSeconds++;
+            document.getElementById('timerTime').innerText = formatTime(totalElapsedSeconds);
+
+            let singleIntervalSeconds = (intervalMin * 60) + intervalSec;
+            let currentLevelElapsed = totalElapsedSeconds % singleIntervalSeconds;
+
+            if (currentLevelElapsed === 0) {
+                if (currentLevel >= targetLevels) {
+                    clearInterval(intervalTimer);
+                    timerRunning = false;
+                    document.getElementById('resetBtn').disabled = false;
+                    playBeep(2); 
+                } else {
+                    currentLevel++;
+                    document.getElementById('ongoingLevel').innerText = formatTwoDigits(currentLevel);
+                    playBeep(1); 
+                }
+            }
+        }, 1000);
+    }
+
+    function pauseTimer() {
+        clearInterval(intervalTimer);
+        timerRunning = false;
+        document.getElementById('resetBtn').disabled = false;
+    }
+
+    function resetTimer() {
+        if (timerRunning) return;
+        clearInterval(intervalTimer);
+        totalElapsedSeconds = 0;
+        currentLevel = 0;
+        document.getElementById('timerTime').innerText = "00:00:00";
+        document.getElementById('ongoingLevel').innerText = "00";
+    }
+
+    // Initialize layout values
+    updateSettingsDisplay();
+</script>
+
+</body>
+</html>
