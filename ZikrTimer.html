@@ -4,155 +4,262 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zikr Timer</title>
+
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4caf50">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Zikr">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="icon" type="image/png" href="icon-192.png">
     <style>
         :root {
-            --bg: #f4f4f4;
+            --bg: #eef1f4;
             --container-bg: #ffffff;
-            --text: #000000;
-            --label: #333333;
-            --time: green;
-            --duration: blue;
-            --shadow: rgba(0,0,0,0.1);
+            --text: #1a1a1a;
+            --label: #667085;
+            --time: #1a1a1a;
+            --accent: #2e9e54;
+            --accent-soft: #e6f4ec;
+            --track: #e6e8eb;
+            --duration: #2e9e54;
+            --shadow: rgba(0,0,0,0.08);
+            --border: #e2e5e9;
         }
         body.dark {
-            --bg: #1a1a1a;
-            --container-bg: #2a2a2a;
-            --text: #e0e0e0;
-            --label: #bbbbbb;
-            --time: #4caf50;
-            --duration: #5b9bff;
+            --bg: #14161a;
+            --container-bg: #1e2127;
+            --text: #f0f2f5;
+            --label: #9aa3af;
+            --time: #f0f2f5;
+            --accent: #4caf50;
+            --accent-soft: #1f3326;
+            --track: #2c313a;
+            --duration: #5bd07e;
             --shadow: rgba(0,0,0,0.5);
+            --border: #2c313a;
         }
+        * { box-sizing: border-box; }
         body {
-            font-family: Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
             text-align: center;
             background-color: var(--bg);
             color: var(--text);
-            padding: 20px;
+            padding: 16px;
+            margin: 0;
             transition: background-color 0.3s, color 0.3s;
         }
         .container {
-            max-width: 500px;
+            max-width: 440px;
             margin: auto;
             background: var(--container-bg);
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px var(--shadow);
+            padding: 18px 20px 26px;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px var(--shadow);
             transition: background-color 0.3s;
         }
-        .header {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-        .display-section {
-            display: flex;
-            justify-content: space-around;
-            margin-bottom: 15px;
-        }
-        .display-block {
-            flex: 1;
-        }
-        .label {
-            font-size: 14px;
-            font-weight: bold;
-            color: var(--label);
-        }
-        .time-display {
-            font-size: 32px;
-            font-weight: bold;
-            color: var(--time);
-            margin-top: 5px;
-        }
-        .control-panel {
-            display: flex;
-            justify-content: space-around;
-            margin-bottom: 20px;
-        }
-        .control-panel button {
-            padding: 10px 20px;
-            font-size: 16px;
-            font-weight: bold;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            color: white;
-        }
-        .btn-start { background-color: green; }
-        .btn-pause { background-color: orange; }
-        .btn-reset { background-color: red; }
-        .btn-reset:disabled { background-color: #ffcccc; cursor: not-allowed; }
-        .settings-section {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 20px;
-        }
-        .settings-group {
-            flex: 1;
-        }
-        .settings-title {
-            font-weight: bold;
-            margin-bottom: 10px;
-            font-size: 16px;
-        }
-        .flex-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-        }
-        .btn-sub-group {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .btn-sub-group button {
-            width: 35px;
-            height: 35px;
-            font-size: 18px;
-            font-weight: bold;
-            margin: 2px;
-            cursor: pointer;
-            background: var(--bg);
-            color: var(--text);
-            border: 1px solid var(--label);
-            border-radius: 5px;
-        }
-        .btn-label {
-            font-size: 12px;
-            margin: 4px 0;
-        }
-        .btn-val {
-            font-size: 18px;
-            font-weight: bold;
-            margin-top: 5px;
-        }
-        .duration-display {
-            margin-top: 25px;
-            font-size: 18px;
-            font-weight: bold;
-            color: var(--duration);
-        }
-        .settings-title { color: var(--text); }
+
+        /* Top bar */
         .top-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
+            gap: 10px;
+            margin-bottom: 6px;
         }
         .top-bar select,
-        .theme-toggle {
-            padding: 5px 10px;
+        .icon-btn {
+            padding: 7px 12px;
             font-size: 14px;
-            border-radius: 5px;
+            border-radius: 10px;
             cursor: pointer;
             background: var(--bg);
             color: var(--text);
-            border: 1px solid var(--label);
+            border: 1px solid var(--border);
+            transition: background 0.2s;
         }
-        /* RTL support for Urdu */
-        body.rtl {
-            direction: rtl;
+        .icon-btn:hover, .top-bar select:hover { background: var(--accent-soft); }
+
+        /* Header */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin: 6px 0 14px;
         }
+        .logo {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+        .header span { font-size: 22px; font-weight: 700; }
+
+        /* Progress ring */
+        .ring-wrap {
+            position: relative;
+            width: 240px;
+            height: 240px;
+            margin: 6px auto 4px;
+        }
+        .ring { width: 100%; height: 100%; transform: rotate(-90deg); }
+        .ring-track { fill: none; stroke: var(--track); stroke-width: 14; }
+        .ring-progress {
+            fill: none;
+            stroke: var(--accent);
+            stroke-width: 14;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.4s linear;
+        }
+        body.rtl .ring { transform: rotate(-90deg) scaleX(-1); }
+        .ring-center {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .ring-time {
+            font-size: 46px;
+            font-weight: 700;
+            color: var(--time);
+            font-variant-numeric: tabular-nums;
+            line-height: 1;
+        }
+        .ring-level {
+            margin-top: 10px;
+            font-size: 15px;
+            color: var(--label);
+            font-weight: 600;
+        }
+        .ring-level .muted { font-weight: 500; }
+        .ring-level.done { color: var(--accent); }
+
+        /* Stats */
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+            margin: 14px 0 18px;
+        }
+        .stat {
+            flex: 1;
+            max-width: 150px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px 6px;
+        }
+        .stat-val {
+            font-size: 19px;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+        }
+        .stat-cap {
+            font-size: 12px;
+            color: var(--label);
+            margin-top: 2px;
+        }
+
+        /* Controls */
+        .control-panel {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 22px;
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+            font-size: 18px;
+            font-weight: 700;
+            border: none;
+            border-radius: 30px;
+            padding: 14px 30px;
+            min-width: 150px;
+            cursor: pointer;
+            box-shadow: 0 4px 14px var(--shadow);
+            transition: transform 0.1s, filter 0.2s;
+        }
+        .btn-primary:hover { filter: brightness(1.05); }
+        .btn-primary:active { transform: scale(0.97); }
+        .btn-secondary {
+            background: transparent;
+            color: var(--label);
+            font-size: 15px;
+            font-weight: 600;
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            padding: 13px 20px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-secondary:hover:not(:disabled) { background: var(--bg); color: var(--text); }
+        .btn-secondary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        /* Settings */
+        .settings {
+            border-top: 1px solid var(--border);
+            padding-top: 16px;
+            transition: opacity 0.2s;
+        }
+        .settings.locked { opacity: 0.45; }
+        .settings-head {
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--label);
+            margin-bottom: 14px;
+        }
+        .setting {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .setting-cap { font-size: 15px; font-weight: 600; text-align: start; }
+        .dual { display: flex; gap: 16px; }
+        .stepper-group { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .stepper { display: flex; align-items: center; gap: 10px; }
+        .stepper button {
+            width: 38px;
+            height: 38px;
+            font-size: 22px;
+            font-weight: 700;
+            line-height: 1;
+            border-radius: 50%;
+            cursor: pointer;
+            background: var(--bg);
+            color: var(--accent);
+            border: 1px solid var(--border);
+            transition: background 0.15s;
+        }
+        .stepper button:hover:not(:disabled) { background: var(--accent-soft); }
+        .stepper button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .stepper .val {
+            font-size: 22px;
+            font-weight: 700;
+            min-width: 34px;
+            font-variant-numeric: tabular-nums;
+        }
+        .unit { font-size: 12px; color: var(--label); }
+        .total {
+            margin-top: 18px;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--duration);
+        }
+        .total span:last-child { font-variant-numeric: tabular-nums; }
+
+        body.rtl .setting-cap, body.rtl .settings-head { text-align: right; }
     </style>
 </head>
 <body>
@@ -163,61 +270,87 @@
             <option value="en">English</option>
             <option value="ur">اردو</option>
         </select>
-        <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙 Dark</button>
+        <button class="icon-btn" id="themeToggle" onclick="toggleTheme()">🌙 Dark</button>
     </div>
 
-    <div class="header" data-i18n="title">Zikr Timer</div>
+    <div class="header">
+        <img src="icon-192.png" alt="Zikr Timer logo" class="logo">
+        <span data-i18n="title">Zikr Timer</span>
+    </div>
 
-    <div class="display-section">
-        <div class="display-block">
-            <div class="label" data-i18n="level">Level</div>
-            <div id="ongoingLevel" class="time-display">00</div>
-        </div>
-        <div class="display-block">
-            <div class="label" data-i18n="timerTime">Timer Time</div>
-            <div id="timerTime" class="time-display">00:00:00</div>
+    <!-- Circular countdown -->
+    <div class="ring-wrap">
+        <svg class="ring" viewBox="0 0 240 240">
+            <circle class="ring-track" cx="120" cy="120" r="104"></circle>
+            <circle class="ring-progress" id="ringProgress" cx="120" cy="120" r="104"></circle>
+        </svg>
+        <div class="ring-center">
+            <div class="ring-time" id="ringTime">00:00</div>
+            <div class="ring-level" id="ringLevel"></div>
         </div>
     </div>
 
+    <!-- Session stats -->
+    <div class="stats">
+        <div class="stat">
+            <div class="stat-val" id="statElapsed">00:00</div>
+            <div class="stat-cap" data-i18n="elapsed">Elapsed</div>
+        </div>
+        <div class="stat">
+            <div class="stat-val" id="statRemaining">00:00</div>
+            <div class="stat-cap" data-i18n="remaining">Remaining</div>
+        </div>
+    </div>
+
+    <!-- Controls -->
     <div class="control-panel">
-        <button class="btn-start" onclick="startTimer()" data-i18n="start">Start</button>
-        <button class="btn-pause" onclick="pauseTimer()" data-i18n="pause">Pause</button>
-        <button class="btn-reset" id="resetBtn" onclick="resetTimer()" data-i18n="reset">Reset</button>
+        <button class="btn-primary" id="primaryBtn" onclick="togglePlay()">▶ Start</button>
+        <button class="btn-secondary" id="resetBtn" onclick="resetTimer()">⟳ Reset</button>
     </div>
 
-    <div class="settings-section">
-        <div class="settings-group">
-            <div class="settings-title" data-i18n="timeInterval">Time Interval</div>
-            <div class="flex-buttons">
-                <div class="btn-sub-group">
-                    <button onclick="changeVal('min', 1)">+</button>
-                    <div class="btn-label" data-i18n="min">min</div>
-                    <button onclick="changeVal('min', -1)">-</button>
-                    <div id="valMin" class="btn-val">03</div>
+    <!-- Settings -->
+    <div class="settings" id="settingsCard">
+        <div class="settings-head" data-i18n="settings">Settings</div>
+
+        <div class="setting">
+            <div class="setting-cap" data-i18n="intervalLabel">Interval per level</div>
+            <div class="dual">
+                <div class="stepper-group">
+                    <div class="stepper">
+                        <button onclick="changeVal('min', -1)">−</button>
+                        <div id="valMin" class="val">03</div>
+                        <button onclick="changeVal('min', 1)">+</button>
+                    </div>
+                    <div class="unit" data-i18n="min">min</div>
                 </div>
-                <div class="btn-sub-group">
-                    <button onclick="changeVal('sec', 1)">+</button>
-                    <div class="btn-label" data-i18n="sec">sec</div>
-                    <button onclick="changeVal('sec', -1)">-</button>
-                    <div id="valSec" class="btn-val">13</div>
+                <div class="stepper-group">
+                    <div class="stepper">
+                        <button onclick="changeVal('sec', -1)">−</button>
+                        <div id="valSec" class="val">13</div>
+                        <button onclick="changeVal('sec', 1)">+</button>
+                    </div>
+                    <div class="unit" data-i18n="sec">sec</div>
                 </div>
             </div>
         </div>
 
-        <div class="settings-group">
-            <div class="settings-title" data-i18n="levels">Levels</div>
-            <div class="flex-buttons">
-                <div class="btn-sub-group">
+        <div class="setting">
+            <div class="setting-cap" data-i18n="levelsLabel">Number of levels</div>
+            <div class="stepper-group">
+                <div class="stepper">
+                    <button onclick="changeVal('lev', -1)">−</button>
+                    <div id="valLev" class="val">14</div>
                     <button onclick="changeVal('lev', 1)">+</button>
-                    <div class="btn-label" data-i18n="count">count</div>
-                    <button onclick="changeVal('lev', -1)">-</button>
-                    <div id="valLev" class="btn-val">14</div>
                 </div>
+                <div class="unit" data-i18n="count">count</div>
             </div>
         </div>
-    </div>
 
-    <div id="timerDuration" class="duration-display"><span data-i18n="timerDuration">Timer Duration</span> 00:00:00</div>
+        <div class="total">
+            <span data-i18n="total">Total duration</span>
+            <span id="totalDur">00:00:00</span>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -226,40 +359,180 @@
         en: {
             title: "Zikr Timer",
             level: "Level",
-            timerTime: "Timer Time",
             start: "Start",
             pause: "Pause",
+            resume: "Resume",
             reset: "Reset",
-            timeInterval: "Time Interval",
+            settings: "Settings",
+            intervalLabel: "Interval per level",
+            levelsLabel: "Number of levels",
             min: "min",
             sec: "sec",
-            levels: "Levels",
             count: "count",
-            timerDuration: "Timer Duration",
+            elapsed: "Elapsed",
+            remaining: "Remaining",
+            total: "Total duration",
+            complete: "Completed ✓",
             dark: "🌙 Dark",
             light: "☀️ Light"
         },
         ur: {
             title: "ذکر ٹائمر",
             level: "سطح",
-            timerTime: "ٹائمر کا وقت",
             start: "شروع",
             pause: "روکیں",
+            resume: "جاری رکھیں",
             reset: "ری سیٹ",
-            timeInterval: "وقفہ",
+            settings: "ترتیبات",
+            intervalLabel: "ہر سطح کا وقفہ",
+            levelsLabel: "سطحوں کی تعداد",
             min: "منٹ",
             sec: "سیکنڈ",
-            levels: "سطحیں",
             count: "تعداد",
-            timerDuration: "کل دورانیہ",
+            elapsed: "گزرا وقت",
+            remaining: "باقی وقت",
+            total: "کل دورانیہ",
+            complete: "مکمل ✓",
             dark: "🌙 ڈارک",
             light: "☀️ لائٹ"
         }
     };
 
+    // Configuration
+    let intervalMin = 3;
+    let intervalSec = 13;
+    let targetLevels = 14;
+
+    // State
+    let timerRunning = false;
+    let completed = false;
+    let totalElapsed = 0;
+    let elapsedInLevel = 0;
+    let currentLevel = 0;        // 0 = not started yet
+    let intervalTimer = null;
+
+    // Preferences
     let currentLang = 'en';
     let darkMode = false;
 
+    const RING_R = 104;
+    const RING_C = 2 * Math.PI * RING_R;
+
+    // ---------- Helpers ----------
+    function secondsPerLevel() { return intervalMin * 60 + intervalSec; }
+
+    function formatTwoDigits(n) { return n.toString().padStart(2, '0'); }
+
+    function formatClock(totalSeconds) {
+        let s = Math.max(0, Math.floor(totalSeconds));
+        let h = Math.floor(s / 3600);
+        let m = Math.floor((s % 3600) / 60);
+        let sec = s % 60;
+        return h > 0
+            ? `${h}:${formatTwoDigits(m)}:${formatTwoDigits(sec)}`
+            : `${formatTwoDigits(m)}:${formatTwoDigits(sec)}`;
+    }
+
+    function savePrefs() {
+        try {
+            localStorage.setItem('zikrTimer', JSON.stringify({
+                intervalMin, intervalSec, targetLevels, currentLang, darkMode
+            }));
+        } catch (e) { /* storage unavailable */ }
+    }
+
+    function loadPrefs() {
+        try {
+            const data = JSON.parse(localStorage.getItem('zikrTimer'));
+            if (!data) return;
+            if (Number.isFinite(data.intervalMin)) intervalMin = data.intervalMin;
+            if (Number.isFinite(data.intervalSec)) intervalSec = data.intervalSec;
+            if (Number.isFinite(data.targetLevels)) targetLevels = Math.max(1, data.targetLevels);
+            if (translations[data.currentLang]) currentLang = data.currentLang;
+            darkMode = !!data.darkMode;
+        } catch (e) { /* ignore */ }
+    }
+
+    // ---------- Audio ----------
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+    function playBeep(count) {
+        if (!audioCtx) audioCtx = new AudioCtx();
+        let delay = 0;
+        for (let i = 0; i < count; i++) {
+            setTimeout(() => {
+                let osc = audioCtx.createOscillator();
+                let gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.15);
+            }, delay);
+            delay += 300;
+        }
+    }
+
+    // ---------- Rendering ----------
+    function setRing(progress) {
+        const ring = document.getElementById('ringProgress');
+        ring.style.strokeDasharray = RING_C;
+        ring.style.strokeDashoffset = RING_C * (1 - Math.min(1, Math.max(0, progress)));
+    }
+
+    function updatePrimaryButton() {
+        const dict = translations[currentLang];
+        const btn = document.getElementById('primaryBtn');
+        if (timerRunning) {
+            btn.innerText = '⏸ ' + dict.pause;
+        } else if (!completed && totalElapsed > 0) {
+            btn.innerText = '▶ ' + dict.resume;
+        } else {
+            btn.innerText = '▶ ' + dict.start;
+        }
+        document.getElementById('resetBtn').innerText = '⟳ ' + dict.reset;
+        document.getElementById('resetBtn').disabled = timerRunning || (totalElapsed === 0 && !completed);
+    }
+
+    function updateDisplays() {
+        const dict = translations[currentLang];
+        const spl = secondsPerLevel();
+        const total = spl * targetLevels;
+        const lvl = Math.min(targetLevels, currentLevel || 1);
+        const remInLevel = Math.max(0, spl - elapsedInLevel);
+        const levelProgress = spl ? elapsedInLevel / spl : 0;
+
+        setRing(completed ? 1 : levelProgress);
+        document.getElementById('ringTime').innerText = formatClock(completed ? 0 : remInLevel);
+
+        const ringLevel = document.getElementById('ringLevel');
+        if (completed) {
+            ringLevel.innerHTML = dict.complete;
+            ringLevel.classList.add('done');
+        } else {
+            ringLevel.innerHTML = `<span class="muted">${dict.level}</span> ${lvl} / ${targetLevels}`;
+            ringLevel.classList.remove('done');
+        }
+
+        document.getElementById('statElapsed').innerText = formatClock(totalElapsed);
+        document.getElementById('statRemaining').innerText = formatClock(Math.max(0, total - totalElapsed));
+
+        document.getElementById('valMin').innerText = formatTwoDigits(intervalMin);
+        document.getElementById('valSec').innerText = formatTwoDigits(intervalSec);
+        document.getElementById('valLev').innerText = formatTwoDigits(targetLevels);
+        document.getElementById('totalDur').innerText = formatClock(total);
+
+        updatePrimaryButton();
+    }
+
+    function setSettingsLocked(locked) {
+        document.querySelectorAll('.stepper button').forEach(b => b.disabled = locked);
+        document.getElementById('settingsCard').classList.toggle('locked', locked);
+    }
+
+    // ---------- Language & theme ----------
     function setLanguage(lang) {
         currentLang = translations[lang] ? lang : 'en';
         const dict = translations[currentLang];
@@ -272,7 +545,8 @@
         document.body.classList.toggle('rtl', currentLang === 'ur');
         document.getElementById('langSelect').value = currentLang;
         updateThemeButton();
-        calculateDuration();
+        updateDisplays();
+        savePrefs();
     }
 
     function updateThemeButton() {
@@ -284,131 +558,113 @@
         darkMode = !darkMode;
         document.body.classList.toggle('dark', darkMode);
         updateThemeButton();
+        savePrefs();
     }
 
-    // Configuration values
-    let intervalMin = 3;
-    let intervalSec = 13;
-    let targetLevels = 14;
-
-    // State values
-    let timerRunning = false;
-    let totalElapsedSeconds = 0;
-    let currentLevel = 0;
-    let intervalTimer = null;
-
-    // Audio Context Setup
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    let audioCtx = null;
-
-    function playBeep(count) {
-        if (!audioCtx) audioCtx = new AudioContext();
-        let delay = 0;
-        for (let i = 0; i < count; i++) {
-            setTimeout(() => {
-                let osc = audioCtx.createOscillator();
-                let gain = audioCtx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(880, audioCtx.currentTime); 
-                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.15);
-            }, delay);
-            delay += 300; 
-        }
-    }
-
-    function formatTwoDigits(num) {
-        return num.toString().padStart(2, '0');
-    }
-
-    function formatTime(totalSeconds) {
-        let hrs = Math.floor(totalSeconds / 3600);
-        let mins = Math.floor((totalSeconds % 3600) / 60);
-        let secs = totalSeconds % 60;
-        return `${formatTwoDigits(hrs)}:${formatTwoDigits(mins)}:${formatTwoDigits(secs)}`;
-    }
-
-    function calculateDuration() {
-        let singleIntervalSeconds = (intervalMin * 60) + intervalSec;
-        let totalDurationSeconds = singleIntervalSeconds * targetLevels;
-        document.getElementById('timerDuration').innerHTML =
-            '<span data-i18n="timerDuration">' + translations[currentLang].timerDuration + '</span> ' +
-            formatTime(totalDurationSeconds);
-    }
-
-    function updateSettingsDisplay() {
-        document.getElementById('valMin').innerText = formatTwoDigits(intervalMin);
-        document.getElementById('valSec').innerText = formatTwoDigits(intervalSec);
-        document.getElementById('valLev').innerText = formatTwoDigits(targetLevels);
-        calculateDuration();
-    }
-
+    // ---------- Settings steppers ----------
     function changeVal(type, amount) {
-        if (timerRunning) return; 
+        if (timerRunning) return;
         if (type === 'min') {
             intervalMin = Math.max(0, intervalMin + amount);
         } else if (type === 'sec') {
-            intervalSec = intervalSec + amount;
+            intervalSec += amount;
             if (intervalSec > 59) intervalSec = 0;
             if (intervalSec < 0) intervalSec = 59;
         } else if (type === 'lev') {
             targetLevels = Math.max(1, targetLevels + amount);
         }
-        updateSettingsDisplay();
+        // Editing settings starts a fresh session
+        if (!timerRunning && totalElapsed === 0) {
+            currentLevel = 0;
+            elapsedInLevel = 0;
+            completed = false;
+        }
+        updateDisplays();
+        savePrefs();
+    }
+
+    // ---------- Timer control ----------
+    function togglePlay() {
+        if (timerRunning) pauseTimer();
+        else startTimer();
     }
 
     function startTimer() {
         if (timerRunning) return;
-        if ((intervalMin * 60 + intervalSec) === 0) return;
+        if (secondsPerLevel() === 0) return;
+
+        if (completed) {        // restart a finished session
+            totalElapsed = 0;
+            elapsedInLevel = 0;
+            currentLevel = 0;
+            completed = false;
+        }
 
         timerRunning = true;
-        document.getElementById('resetBtn').disabled = true;
-
         if (currentLevel === 0) currentLevel = 1;
-        document.getElementById('ongoingLevel').innerText = formatTwoDigits(currentLevel);
+        setSettingsLocked(true);
 
         intervalTimer = setInterval(() => {
-            totalElapsedSeconds++;
-            document.getElementById('timerTime').innerText = formatTime(totalElapsedSeconds);
+            totalElapsed++;
+            elapsedInLevel++;
+            const spl = secondsPerLevel();
 
-            let singleIntervalSeconds = (intervalMin * 60) + intervalSec;
-            let currentLevelElapsed = totalElapsedSeconds % singleIntervalSeconds;
-
-            if (currentLevelElapsed === 0) {
+            if (elapsedInLevel >= spl) {
                 if (currentLevel >= targetLevels) {
-                    clearInterval(intervalTimer);
-                    timerRunning = false;
-                    document.getElementById('resetBtn').disabled = false;
-                    playBeep(2); 
-                } else {
-                    currentLevel++;
-                    document.getElementById('ongoingLevel').innerText = formatTwoDigits(currentLevel);
-                    playBeep(1); 
+                    finishTimer();
+                    return;
                 }
+                currentLevel++;
+                elapsedInLevel = 0;
+                playBeep(1);
             }
+            updateDisplays();
         }, 1000);
+
+        updateDisplays();
+    }
+
+    function finishTimer() {
+        clearInterval(intervalTimer);
+        timerRunning = false;
+        completed = true;
+        elapsedInLevel = secondsPerLevel();
+        setSettingsLocked(false);
+        playBeep(2);
+        updateDisplays();
     }
 
     function pauseTimer() {
         clearInterval(intervalTimer);
         timerRunning = false;
-        document.getElementById('resetBtn').disabled = false;
+        setSettingsLocked(false);
+        updateDisplays();
     }
 
     function resetTimer() {
         if (timerRunning) return;
         clearInterval(intervalTimer);
-        totalElapsedSeconds = 0;
+        totalElapsed = 0;
+        elapsedInLevel = 0;
         currentLevel = 0;
-        document.getElementById('timerTime').innerText = "00:00:00";
-        document.getElementById('ongoingLevel').innerText = "00";
+        completed = false;
+        setSettingsLocked(false);
+        updateDisplays();
     }
 
-    // Initialize layout values
-    updateSettingsDisplay();
+    // ---------- Init ----------
+    loadPrefs();
+    document.body.classList.toggle('dark', darkMode);
+    setRing(0);
+    setLanguage(currentLang);
+
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js').catch((err) => {
+                console.warn('Service worker registration failed:', err);
+            });
+        });
+    }
 </script>
 
 </body>

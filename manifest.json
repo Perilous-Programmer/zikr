@@ -1,0 +1,27 @@
+{
+  "name": "Zikr Timer",
+  "short_name": "Zikr",
+  "description": "A simple Zikr counter and interval timer with English/Urdu and light/dark modes.",
+  "start_url": "./ZikrTimer.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1a1a1a",
+  "theme_color": "#4caf50",
+  "lang": "en",
+  "dir": "auto",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
