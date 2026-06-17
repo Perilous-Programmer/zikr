@@ -1,5 +1,5 @@
 // Service worker for Zikr Timer PWA
-const CACHE_NAME = 'zikr-timer-v1';
+const CACHE_NAME = 'zikr-timer-v2';
 const ASSETS = [
   './',
   './ZikrTimer.html',
