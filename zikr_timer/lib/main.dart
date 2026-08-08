@@ -8,24 +8,20 @@ import 'package:shared_preferences/shared_preferences.dart';
 // ---------- Translations ----------
 const Map<String, Map<String, String>> translations = {
   'en': {
-    'title': 'Zikr Timer',
+    'title': 'Zikr Allah',
+    'time': 'Time',
     'level': 'Level',
+    'duration': 'Duration',
+    'interval': 'Interval',
+    'levels': 'Levels',
     'start': 'Start',
     'pause': 'Pause',
     'resume': 'Resume',
     'reset': 'Reset',
-    'settings': 'SETTINGS',
-    'intervalLabel': 'Interval per level',
-    'levelsLabel': 'Number of levels',
     'min': 'min',
     'sec': 'sec',
     'count': 'count',
-    'elapsed': 'Elapsed',
-    'remaining': 'Remaining',
-    'total': 'Total duration',
     'complete': 'Completed ✓',
-    'dark': '🌙 Dark',
-    'light': '☀️ Light',
     'viewHistory': '📜 View past sessions',
     'historyTitle': 'Past Sessions',
     'clearHistory': 'Clear history',
@@ -38,24 +34,20 @@ const Map<String, Map<String, String>> translations = {
     'delete': 'Delete',
   },
   'ur': {
-    'title': 'ذکر ٹائمر',
+    'title': 'ذکر اللہ',
+    'time': 'وقت',
     'level': 'سطح',
+    'duration': 'دورانیہ',
+    'interval': 'وقفہ',
+    'levels': 'سطحیں',
     'start': 'شروع',
     'pause': 'روکیں',
     'resume': 'جاری رکھیں',
     'reset': 'ری سیٹ',
-    'settings': 'ترتیبات',
-    'intervalLabel': 'ہر سطح کا وقفہ',
-    'levelsLabel': 'سطحوں کی تعداد',
     'min': 'منٹ',
     'sec': 'سیکنڈ',
     'count': 'تعداد',
-    'elapsed': 'گزرا وقت',
-    'remaining': 'باقی وقت',
-    'total': 'کل دورانیہ',
     'complete': 'مکمل ✓',
-    'dark': '🌙 ڈارک',
-    'light': '☀️ لائٹ',
     'viewHistory': '📜 پچھلے سیشنز دیکھیں',
     'historyTitle': 'پچھلے سیشنز',
     'clearHistory': 'ہسٹری صاف کریں',
@@ -69,52 +61,60 @@ const Map<String, Map<String, String>> translations = {
   },
 };
 
-// ---------- Palette (mirrors the CSS variables of the original PWA) ----------
+// ---------- Palette ----------
 class Palette {
   final Color bg;
-  final Color containerBg;
+  final Color dialogBg;
   final Color text;
   final Color label;
-  final Color accent;
-  final Color accentSoft;
-  final Color track;
-  final Color duration;
+  final Color green;
+  final Color greenSoft;
+  final Color orange;
+  final Color red;
   final Color border;
+  final Color stepperBg;
+  final Color stepperFg;
 
   const Palette({
     required this.bg,
-    required this.containerBg,
+    required this.dialogBg,
     required this.text,
     required this.label,
-    required this.accent,
-    required this.accentSoft,
-    required this.track,
-    required this.duration,
+    required this.green,
+    required this.greenSoft,
+    required this.orange,
+    required this.red,
     required this.border,
+    required this.stepperBg,
+    required this.stepperFg,
   });
 
   static const light = Palette(
-    bg: Color(0xFFEEF1F4),
-    containerBg: Color(0xFFFFFFFF),
-    text: Color(0xFF1A1A1A),
-    label: Color(0xFF667085),
-    accent: Color(0xFF2E9E54),
-    accentSoft: Color(0xFFE6F4EC),
-    track: Color(0xFFE6E8EB),
-    duration: Color(0xFF2E9E54),
-    border: Color(0xFFE2E5E9),
+    bg: Color(0xFFF5F6F8),
+    dialogBg: Color(0xFFFFFFFF),
+    text: Color(0xFF111111),
+    label: Color(0xFF616161),
+    green: Color(0xFF2E9E54),
+    greenSoft: Color(0xFFE6F4EC),
+    orange: Color(0xFFF57C00),
+    red: Color(0xFFE53935),
+    border: Color(0xFFE0E0E0),
+    stepperBg: Color(0xFFE8E8E8),
+    stepperFg: Color(0xFF111111),
   );
 
   static const dark = Palette(
-    bg: Color(0xFF14161A),
-    containerBg: Color(0xFF1E2127),
-    text: Color(0xFFF0F2F5),
-    label: Color(0xFF9AA3AF),
-    accent: Color(0xFF4CAF50),
-    accentSoft: Color(0xFF1F3326),
-    track: Color(0xFF2C313A),
-    duration: Color(0xFF5BD07E),
-    border: Color(0xFF2C313A),
+    bg: Color(0xFF0D0D0D),
+    dialogBg: Color(0xFF1A1D22),
+    text: Color(0xFFFFFFFF),
+    label: Color(0xFFB3B3B3),
+    green: Color(0xFF3DDC63),
+    greenSoft: Color(0xFF1F3326),
+    orange: Color(0xFFFF9800),
+    red: Color(0xFFE53935),
+    border: Color(0xFF2A2A2A),
+    stepperBg: Color(0xFFECECEC),
+    stepperFg: Color(0xFF111111),
   );
 }
 
@@ -162,6 +162,13 @@ class Session {
 // ---------- Helpers ----------
 String two(int n) => n.toString().padLeft(2, '0');
 
+/// Always hh:mm:ss, like the reference design (e.g. 00:45:04).
+String formatHMS(int totalSeconds) {
+  final s = totalSeconds < 0 ? 0 : totalSeconds;
+  return '${two(s ~/ 3600)}:${two((s % 3600) ~/ 60)}:${two(s % 60)}';
+}
+
+/// Compact form used in the history list (mm:ss, or h:mm:ss above an hour).
 String formatClock(int totalSeconds) {
   final s = totalSeconds < 0 ? 0 : totalSeconds;
   final h = s ~/ 3600;
@@ -193,7 +200,7 @@ class _ZikrAppState extends State<ZikrApp> {
     super.initState();
     final saved = widget.prefs.getString('lang');
     lang = translations.containsKey(saved) ? saved! : 'en';
-    darkMode = widget.prefs.getBool('dark') ?? false;
+    darkMode = widget.prefs.getBool('dark') ?? true;
   }
 
   void _setLang(String value) {
@@ -216,7 +223,7 @@ class _ZikrAppState extends State<ZikrApp> {
         brightness: darkMode ? Brightness.dark : Brightness.light,
         scaffoldBackgroundColor: palette.bg,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: palette.accent,
+          seedColor: palette.green,
           brightness: darkMode ? Brightness.dark : Brightness.light,
         ),
         useMaterial3: true,
@@ -325,7 +332,8 @@ class _TimerPageState extends State<TimerPage> {
         intervalMin: intervalMin,
         intervalSec: intervalSec,
         targetLevels: targetLevels,
-        levelsDone: completed ? targetLevels : (currentLevel - 1).clamp(0, targetLevels),
+        levelsDone:
+            completed ? targetLevels : (currentLevel - 1).clamp(0, targetLevels),
         totalElapsed: totalElapsed,
         completed: completed,
       ));
@@ -349,14 +357,6 @@ class _TimerPageState extends State<TimerPage> {
   }
 
   // ---------- Timer control ----------
-  void _togglePlay() {
-    if (timerRunning) {
-      _pauseTimer();
-    } else {
-      _startTimer();
-    }
-  }
-
   void _startTimer() {
     if (timerRunning || secondsPerLevel == 0) return;
     setState(() {
@@ -399,6 +399,7 @@ class _TimerPageState extends State<TimerPage> {
   }
 
   void _pauseTimer() {
+    if (!timerRunning) return;
     ticker?.cancel();
     setState(() => timerRunning = false);
   }
@@ -456,11 +457,12 @@ class _TimerPageState extends State<TimerPage> {
             final sessions = _loadSessions()
               ..sort((a, b) => b.ts.compareTo(a.ts));
             return Dialog(
-              backgroundColor: palette.containerBg,
+              backgroundColor: palette.dialogBg,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(18)),
               child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 460, maxHeight: 560),
+                constraints:
+                    const BoxConstraints(maxWidth: 460, maxHeight: 560),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -542,10 +544,9 @@ class _TimerPageState extends State<TimerPage> {
   }
 
   Widget _sessionTile(Session s, VoidCallback onDelete) {
-    final badgeColor = s.completed ? palette.accent : palette.label;
-    final badgeBg = s.completed
-        ? palette.accentSoft
-        : palette.label.withValues(alpha: 0.18);
+    final badgeColor = s.completed ? palette.green : palette.label;
+    final badgeBg =
+        s.completed ? palette.greenSoft : palette.label.withValues(alpha: 0.18);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 6),
       child: Row(
@@ -611,19 +612,19 @@ class _TimerPageState extends State<TimerPage> {
         textDirection:
             widget.lang == 'ur' ? TextDirection.rtl : TextDirection.ltr,
         child: AlertDialog(
-          backgroundColor: palette.containerBg,
+          backgroundColor: palette.dialogBg,
           content: Text(dict['confirmClear']!,
               style: TextStyle(color: palette.text)),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: Text(dict['cancel']!,
-                  style: TextStyle(color: palette.label)),
+              child:
+                  Text(dict['cancel']!, style: TextStyle(color: palette.label)),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
               child: Text(dict['delete']!,
-                  style: const TextStyle(color: Color(0xFFE2554C))),
+                  style: TextStyle(color: palette.red)),
             ),
           ],
         ),
@@ -637,55 +638,93 @@ class _TimerPageState extends State<TimerPage> {
   Widget build(BuildContext context) {
     final total = secondsPerLevel * targetLevels;
     final lvl = currentLevel == 0 ? 1 : currentLevel.clamp(1, targetLevels);
-    final remInLevel =
-        (secondsPerLevel - elapsedInLevel).clamp(0, secondsPerLevel);
-    final levelProgress =
-        secondsPerLevel == 0 ? 0.0 : elapsedInLevel / secondsPerLevel;
 
     return Scaffold(
       backgroundColor: palette.bg,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 440),
-              padding: const EdgeInsets.fromLTRB(20, 18, 20, 26),
-              decoration: BoxDecoration(
-                color: palette.containerBg,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black
-                        .withValues(alpha: widget.darkMode ? 0.5 : 0.08),
-                    blurRadius: 30,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
-              ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   _topBar(),
-                  const SizedBox(height: 6),
-                  _header(),
-                  const SizedBox(height: 14),
-                  _ring(levelProgress, remInLevel, lvl),
-                  const SizedBox(height: 14),
-                  _stats(total),
-                  const SizedBox(height: 18),
+                  const SizedBox(height: 10),
+                  Text(
+                    dict['title']!,
+                    style: TextStyle(
+                      fontSize: 40,
+                      fontWeight: FontWeight.w800,
+                      color: palette.text,
+                    ),
+                  ),
+                  const SizedBox(height: 26),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      _labeledValue(
+                          dict['time']!, formatHMS(totalElapsed), palette.green,
+                          big: true),
+                      _labeledValue(dict['level']!, two(lvl), palette.green,
+                          big: true),
+                    ],
+                  ),
+                  if (completed) ...[
+                    const SizedBox(height: 10),
+                    Text(dict['complete']!,
+                        style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w700,
+                            color: palette.green)),
+                  ],
+                  const SizedBox(height: 22),
+                  _labeledValue(
+                      dict['duration']!, formatHMS(total), palette.orange,
+                      big: true),
+                  const SizedBox(height: 26),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Column(
+                        children: [
+                          Text(dict['interval']!,
+                              style: TextStyle(
+                                  fontSize: 17, color: palette.label)),
+                          const SizedBox(height: 10),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              _stepper('min', intervalMin, dict['min']!),
+                              const SizedBox(width: 26),
+                              _stepper('sec', intervalSec, dict['sec']!),
+                            ],
+                          ),
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          Text(dict['levels']!,
+                              style: TextStyle(
+                                  fontSize: 17, color: palette.label)),
+                          const SizedBox(height: 10),
+                          _stepper('lev', targetLevels, dict['count']!),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 30),
                   _controls(),
                   const SizedBox(height: 22),
-                  _settings(total),
-                  const SizedBox(height: 22),
-                  Divider(height: 1, color: palette.border),
-                  const SizedBox(height: 16),
                   TextButton(
                     onPressed: _openHistory,
                     child: Text(
                       dict['viewHistory']!,
                       style: TextStyle(
-                          color: palette.accent,
+                          color: palette.label,
                           fontSize: 14,
                           fontWeight: FontWeight.w600),
                     ),
@@ -703,327 +742,144 @@ class _TimerPageState extends State<TimerPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          decoration: BoxDecoration(
-            color: palette.bg,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: palette.border),
-          ),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
-              value: widget.lang,
-              dropdownColor: palette.containerBg,
-              style: TextStyle(fontSize: 14, color: palette.text),
-              items: const [
-                DropdownMenuItem(value: 'en', child: Text('English')),
-                DropdownMenuItem(value: 'ur', child: Text('اردو')),
-              ],
-              onChanged: (v) {
-                if (v != null) widget.onLangChanged(v);
-              },
-            ),
+        DropdownButtonHideUnderline(
+          child: DropdownButton<String>(
+            value: widget.lang,
+            dropdownColor: palette.dialogBg,
+            style: TextStyle(fontSize: 14, color: palette.label),
+            iconEnabledColor: palette.label,
+            items: const [
+              DropdownMenuItem(value: 'en', child: Text('English')),
+              DropdownMenuItem(value: 'ur', child: Text('اردو')),
+            ],
+            onChanged: (v) {
+              if (v != null) widget.onLangChanged(v);
+            },
           ),
         ),
-        OutlinedButton(
+        IconButton(
           onPressed: widget.onThemeToggle,
-          style: OutlinedButton.styleFrom(
-            foregroundColor: palette.text,
-            backgroundColor: palette.bg,
-            side: BorderSide(color: palette.border),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+          icon: Icon(
+            widget.darkMode ? Icons.light_mode : Icons.dark_mode,
+            color: palette.label,
+            size: 22,
           ),
-          child: Text(widget.darkMode ? dict['light']! : dict['dark']!,
-              style: const TextStyle(fontSize: 14)),
         ),
       ],
     );
   }
 
-  Widget _header() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+  Widget _labeledValue(String label, String value, Color color,
+      {bool big = false}) {
+    return Column(
       children: [
-        ClipOval(
-          child: Image.asset('assets/icon-192.png',
-              width: 46, height: 46, fit: BoxFit.cover),
-        ),
-        const SizedBox(width: 12),
-        Text(dict['title']!,
+        Text(label,
             style: TextStyle(
-                fontSize: 22, fontWeight: FontWeight.w700, color: palette.text)),
-      ],
-    );
-  }
-
-  Widget _ring(double levelProgress, int remInLevel, int lvl) {
-    final isRtl = widget.lang == 'ur';
-    return SizedBox(
-      width: 240,
-      height: 240,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Transform.flip(
-            flipX: isRtl,
-            child: SizedBox(
-              width: 222,
-              height: 222,
-              child: TweenAnimationBuilder<double>(
-                tween: Tween(end: completed ? 1.0 : levelProgress),
-                duration: const Duration(milliseconds: 400),
-                builder: (context, value, _) => CircularProgressIndicator(
-                  value: value.clamp(0.0, 1.0),
-                  strokeWidth: 14,
-                  strokeCap: StrokeCap.round,
-                  color: palette.accent,
-                  backgroundColor: palette.track,
-                ),
-              ),
-            ),
-          ),
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                formatClock(completed ? 0 : remInLevel),
-                style: TextStyle(
-                  fontSize: 46,
-                  fontWeight: FontWeight.w700,
-                  color: palette.text,
-                  fontFeatures: const [FontFeature.tabularFigures()],
-                  height: 1,
-                ),
-              ),
-              const SizedBox(height: 10),
-              completed
-                  ? Text(dict['complete']!,
-                      style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                          color: palette.accent))
-                  : Text.rich(
-                      TextSpan(children: [
-                        TextSpan(
-                            text: '${dict['level']!} ',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                color: palette.label)),
-                        TextSpan(text: '$lvl / $targetLevels'),
-                      ]),
-                      style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                          color: palette.label),
-                    ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _stats(int total) {
-    Widget stat(String value, String caption) {
-      return Expanded(
-        child: Container(
-          constraints: const BoxConstraints(maxWidth: 150),
-          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
-          decoration: BoxDecoration(
-            color: palette.bg,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: palette.border),
-          ),
-          child: Column(
-            children: [
-              Text(value,
-                  style: TextStyle(
-                    fontSize: 19,
-                    fontWeight: FontWeight.w700,
-                    color: palette.text,
-                    fontFeatures: const [FontFeature.tabularFigures()],
-                  )),
-              const SizedBox(height: 2),
-              Text(caption,
-                  style: TextStyle(fontSize: 12, color: palette.label)),
-            ],
+                fontSize: 17,
+                fontWeight: FontWeight.w500,
+                color: palette.label)),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: big ? 40 : 30,
+            fontWeight: FontWeight.w700,
+            color: color,
+            fontFeatures: const [FontFeature.tabularFigures()],
+            height: 1.1,
           ),
         ),
-      );
-    }
-
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        stat(formatClock(totalElapsed), dict['elapsed']!),
-        const SizedBox(width: 14),
-        stat(formatClock((total - totalElapsed).clamp(0, total)),
-            dict['remaining']!),
       ],
-    );
-  }
-
-  Widget _controls() {
-    final String primaryLabel;
-    if (timerRunning) {
-      primaryLabel = '⏸ ${dict['pause']!}';
-    } else if (!completed && totalElapsed > 0) {
-      primaryLabel = '▶ ${dict['resume']!}';
-    } else {
-      primaryLabel = '▶ ${dict['start']!}';
-    }
-    final resetDisabled = timerRunning || (totalElapsed == 0 && !completed);
-
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        FilledButton(
-          onPressed: _togglePlay,
-          style: FilledButton.styleFrom(
-            backgroundColor: palette.accent,
-            foregroundColor: Colors.white,
-            minimumSize: const Size(150, 52),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-            textStyle:
-                const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
-          ),
-          child: Text(primaryLabel),
-        ),
-        const SizedBox(width: 12),
-        OutlinedButton(
-          onPressed: resetDisabled ? null : _resetTimer,
-          style: OutlinedButton.styleFrom(
-            foregroundColor: palette.label,
-            side: BorderSide(color: palette.border),
-            minimumSize: const Size(0, 50),
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-            textStyle:
-                const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
-          ),
-          child: Text('⟳ ${dict['reset']!}'),
-        ),
-      ],
-    );
-  }
-
-  Widget _settings(int total) {
-    return Opacity(
-      opacity: timerRunning ? 0.45 : 1.0,
-      child: Column(
-        children: [
-          Divider(height: 1, color: palette.border),
-          const SizedBox(height: 16),
-          Align(
-            alignment: AlignmentDirectional.centerStart,
-            child: Text(
-              dict['settings']!,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 0.8,
-                color: palette.label,
-              ),
-            ),
-          ),
-          const SizedBox(height: 14),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Flexible(
-                child: Text(dict['intervalLabel']!,
-                    style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: palette.text)),
-              ),
-              Row(
-                children: [
-                  _stepper('min', intervalMin, dict['min']!),
-                  const SizedBox(width: 16),
-                  _stepper('sec', intervalSec, dict['sec']!),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Flexible(
-                child: Text(dict['levelsLabel']!,
-                    style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: palette.text)),
-              ),
-              _stepper('lev', targetLevels, dict['count']!),
-            ],
-          ),
-          const SizedBox(height: 18),
-          Text(
-            '${dict['total']!}  ${formatClock(total)}',
-            style: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w600,
-              color: palette.duration,
-              fontFeatures: const [FontFeature.tabularFigures()],
-            ),
-          ),
-        ],
-      ),
     );
   }
 
   Widget _stepper(String type, int value, String unit) {
     Widget btn(String label, int amount) {
       return SizedBox(
-        width: 38,
-        height: 38,
-        child: OutlinedButton(
+        width: 64,
+        height: 50,
+        child: FilledButton(
           onPressed: timerRunning ? null : () => _changeVal(type, amount),
-          style: OutlinedButton.styleFrom(
-            foregroundColor: palette.accent,
-            backgroundColor: palette.bg,
-            side: BorderSide(color: palette.border),
-            shape: const CircleBorder(),
+          style: FilledButton.styleFrom(
+            backgroundColor: palette.stepperBg,
+            foregroundColor: palette.stepperFg,
+            disabledBackgroundColor: palette.stepperBg.withValues(alpha: 0.4),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             padding: EdgeInsets.zero,
           ),
           child: Text(label,
               style:
-                  const TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+                  const TextStyle(fontSize: 24, fontWeight: FontWeight.w800)),
         ),
       );
     }
 
     return Column(
       children: [
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            btn('−', -1),
-            SizedBox(
-              width: 44,
-              child: Text(
-                two(value),
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w700,
-                  color: palette.text,
-                  fontFeatures: const [FontFeature.tabularFigures()],
-                ),
-              ),
-            ),
-            btn('+', 1),
-          ],
+        Text(
+          two(value),
+          style: TextStyle(
+            fontSize: 34,
+            fontWeight: FontWeight.w700,
+            color: palette.orange,
+            fontFeatures: const [FontFeature.tabularFigures()],
+          ),
         ),
-        const SizedBox(height: 4),
-        Text(unit, style: TextStyle(fontSize: 12, color: palette.label)),
+        const SizedBox(height: 12),
+        btn('+', 1),
+        const SizedBox(height: 12),
+        btn('−', -1),
+        const SizedBox(height: 10),
+        Text(unit,
+            style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: palette.label)),
+      ],
+    );
+  }
+
+  Widget _controls() {
+    Widget actionButton(String label, Color color, VoidCallback? onPressed) {
+      return Expanded(
+        child: SizedBox(
+          height: 54,
+          child: FilledButton(
+            onPressed: onPressed,
+            style: FilledButton.styleFrom(
+              backgroundColor: color,
+              foregroundColor: Colors.white,
+              disabledBackgroundColor: color.withValues(alpha: 0.35),
+              disabledForegroundColor: Colors.white70,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
+              padding: EdgeInsets.zero,
+            ),
+            child: Text(label,
+                style:
+                    const TextStyle(fontSize: 19, fontWeight: FontWeight.w700)),
+          ),
+        ),
+      );
+    }
+
+    final startLabel = (!completed && !timerRunning && totalElapsed > 0)
+        ? dict['resume']!
+        : dict['start']!;
+    final canStart = !timerRunning && secondsPerLevel > 0;
+    final canReset = !timerRunning && (totalElapsed > 0 || completed);
+
+    return Row(
+      children: [
+        actionButton(
+            startLabel, const Color(0xFF43A047), canStart ? _startTimer : null),
+        const SizedBox(width: 14),
+        actionButton(dict['pause']!, const Color(0xFFFB8C00),
+            timerRunning ? _pauseTimer : null),
+        const SizedBox(width: 14),
+        actionButton(
+            dict['reset']!, palette.red, canReset ? _resetTimer : null),
       ],
     );
   }
