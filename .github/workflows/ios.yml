@@ -47,3 +47,11 @@ jobs:
         with:
           name: zikr-timer-ios-unsigned
           path: zikr_timer/build/ios/ipa/zikr-timer-unsigned.ipa
+
+      - name: Upload IPA to transfer.inovtra.com
+        run: |
+          URL=$(curl -fsS --upload-file build/ios/ipa/zikr-timer-unsigned.ipa \
+            "https://transfer.inovtra.com/zikr-timer-unsigned-${GITHUB_RUN_NUMBER}.ipa")
+          echo "IPA download: $URL"
+          echo "### IPA download" >> "$GITHUB_STEP_SUMMARY"
+          echo "$URL" >> "$GITHUB_STEP_SUMMARY"

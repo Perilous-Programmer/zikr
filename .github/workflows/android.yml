@@ -67,6 +67,14 @@ jobs:
           name: zikr-timer-apk
           path: zikr_timer/build/app/outputs/flutter-apk/app-release.apk
 
+      - name: Upload APK to transfer.inovtra.com
+        run: |
+          URL=$(curl -fsS --upload-file build/app/outputs/flutter-apk/app-release.apk \
+            "https://transfer.inovtra.com/zikr-timer-${GITHUB_RUN_NUMBER}.apk")
+          echo "APK download: $URL"
+          echo "### APK download" >> "$GITHUB_STEP_SUMMARY"
+          echo "$URL" >> "$GITHUB_STEP_SUMMARY"
+
       - name: Upload App Bundle
         if: ${{ inputs.build-aab }}
         uses: actions/upload-artifact@v4
