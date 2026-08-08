@@ -33,7 +33,7 @@ jobs:
       # build. Sign it later (e.g. with Xcode/fastlane/AltStore) before
       # installing on a device or shipping to the App Store.
       - name: Build iOS (no codesign)
-        run: flutter build ios --release --no-codesign
+        run: flutter build ios --release --no-codesign --obfuscate --split-debug-info=build/symbols
 
       - name: Package unsigned IPA
         run: |
@@ -47,6 +47,14 @@ jobs:
         with:
           name: zikr-timer-ios-unsigned
           path: zikr_timer/build/ios/ipa/zikr-timer-unsigned.ipa
+
+      # Keep these! Without them, obfuscated crash stack traces can never be
+      # decoded (flutter symbolize -d <symbols dir>).
+      - name: Upload obfuscation symbols
+        uses: actions/upload-artifact@v4
+        with:
+          name: zikr-timer-ios-symbols
+          path: zikr_timer/build/symbols
 
       - name: Upload IPA to transfer.inovtra.com
         run: |
