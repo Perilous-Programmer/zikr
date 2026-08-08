@@ -1,0 +1,36 @@
+name: zikr_timer
+description: "A simple Zikr interval timer with English/Urdu and light/dark modes."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.5.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  shared_preferences: ^2.3.2
+  audioplayers: ^6.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  flutter_launcher_icons: ^0.14.1
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  remove_alpha_ios: true
+  image_path: "assets/icon-512.png"
+  web:
+    generate: true
+    image_path: "assets/icon-512.png"
+    theme_color: "#4caf50"
+    background_color: "#1a1a1a"
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/icon-192.png
+    - assets/beep.wav
