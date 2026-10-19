@@ -7,10 +7,16 @@ on:
         description: "Also build an app bundle (.aab) for Play Store"
         type: boolean
         default: true
+      create-release:
+        description: "Publish the APK (and AAB) as a GitHub release"
+        type: boolean
+        default: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # needed to create the GitHub release
     defaults:
       run:
         working-directory: zikr_timer
@@ -89,3 +95,30 @@ jobs:
         with:
           name: zikr-timer-aab
           path: zikr_timer/build/app/outputs/bundle/release/app-release.aab
+
+      - name: Create GitHub release
+        if: ${{ inputs.create-release }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BUILD_AAB: ${{ inputs.build-aab }}
+        run: |
+          # pubspec "version: 1.0.0+1" -> name 1.0.0, build 1. The run number
+          # keeps tags unique when re-running without bumping the version.
+          VERSION=$(sed -n 's/^version: *//p' pubspec.yaml)
+          NAME=${VERSION%%+*}
+          BUILD=${VERSION#*+}
+          TAG="v${NAME}-${GITHUB_RUN_NUMBER}"
+
+          mkdir -p build/release
+          cp build/app/outputs/flutter-apk/app-release.apk "build/release/zikr-timer-${NAME}.apk"
+          if [ "$BUILD_AAB" = "true" ]; then
+            cp build/app/outputs/bundle/release/app-release.aab "build/release/zikr-timer-${NAME}.aab"
+          fi
+
+          gh release create "$TAG" build/release/* \
+            --target "$GITHUB_SHA" \
+            --title "Zikr Timer ${NAME} (build ${BUILD}, run ${GITHUB_RUN_NUMBER})" \
+            --generate-notes
+
+          echo "### GitHub release" >> "$GITHUB_STEP_SUMMARY"
+          echo "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/releases/tag/${TAG}" >> "$GITHUB_STEP_SUMMARY"

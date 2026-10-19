@@ -25,7 +25,7 @@ cmd.exe /c "cd /d %TEMP%\zikr_timer && flutter build web"   # or: flutter build 
 - Persistence is all `shared_preferences`: individual keys for settings/lang/dark, and a JSON array under `zikrSessions` for history.
 - Beeps play `assets/beep.wav` (generated 880 Hz sine) via `audioplayers`.
 - Launcher icons are generated with `dart run flutter_launcher_icons` from `assets/icon-512.png` (Android, iOS, and web).
-- **CI:** [.github/workflows/android.yml](.github/workflows/android.yml) and [ios.yml](.github/workflows/ios.yml) are manual-only (`workflow_dispatch`). Android release signing reads `android/key.properties`, which CI writes from the `ANDROID_KEYSTORE_*` secrets (base64 keystore, store password, key alias, key password); without it, builds fall back to debug signing. The iOS workflow produces an unsigned IPA — no Apple signing secrets are configured. The Windows machine has no Android SDK, so APK builds only work in CI.
+- **CI:** [.github/workflows/android.yml](.github/workflows/android.yml) and [ios.yml](.github/workflows/ios.yml) are manual-only (`workflow_dispatch`). Android release signing reads `android/key.properties`, which CI writes from the `ANDROID_KEYSTORE_*` secrets (base64 keystore, store password, key alias, key password); without it, builds fall back to debug signing. The Android workflow also publishes the APK/AAB as a GitHub release tagged `v<pubspec version name>-<run number>` (toggle with the `create-release` input). The iOS workflow produces an unsigned IPA — no Apple signing secrets are configured. The Windows machine has no Android SDK, so APK builds only work in CI.
 
 ## Original PWA (root)
 
