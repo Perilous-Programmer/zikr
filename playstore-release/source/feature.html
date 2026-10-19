@@ -1,0 +1,27 @@
+<!doctype html><html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Noto+Nastaliq+Urdu:wght@600&family=Roboto+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;box-sizing:border-box}
+body{width:1024px;height:500px;overflow:hidden;font-family:Outfit,sans-serif;color:#fff;
+background:radial-gradient(circle at 78% 50%,#2a2214 0,#121110 55%,#0b0b0b 100%);position:relative}
+.pat{position:absolute;inset:0;opacity:.07;background-image:radial-gradient(#c8ab7d 1.2px,transparent 1.3px);background-size:22px 22px}
+.left{position:absolute;left:72px;top:0;height:500px;display:flex;flex-direction:column;justify-content:center;width:520px}
+.ur{font-family:'Noto Nastaliq Urdu';font-size:34px;color:#c8ab7d;line-height:1.9;direction:rtl;text-align:left}
+h1{font-size:76px;font-weight:700;letter-spacing:-1.5px;line-height:1}
+p{margin-top:18px;font-size:26px;color:#b8b2a7;line-height:1.35}
+.chips{margin-top:26px;display:flex;gap:10px}
+.chip{border:1.5px solid #3a3326;border-radius:99px;padding:7px 16px;font-size:18px;color:#d9cdb8}
+.coin{position:absolute;right:70px;top:70px;width:360px;height:360px;border-radius:50%;
+box-shadow:0 0 0 2px #3DDC6355,0 0 0 18px #3DDC6312,0 30px 70px #000a;overflow:hidden}
+.coin img{width:100%;height:100%;transform:scale(1.12)}
+.ring{position:absolute;right:52px;top:52px;width:396px;height:396px;border-radius:50%;
+background:conic-gradient(#3DDC63 0 68%,#ffffff14 68% 100%);
+-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 7px),#000 calc(100% - 6px))}
+.time{position:absolute;right:178px;bottom:26px;font-family:'Roboto Mono';font-size:26px;color:#FF9800;background:#0d0d0dcc;padding:2px 14px;border-radius:8px}
+</style></head><body><div class="pat"></div>
+<div class="left"><div class="ur">ذکر ٹائمر</div><h1>Zikr Timer</h1>
+<p>Set your interval and levels.<br>A gentle beep marks each one.</p>
+<div class="chips"><span class="chip">English · اردو</span><span class="chip">Light &amp; dark</span><span class="chip">History</span></div></div>
+<div class="ring"></div><div class="coin"><img src="icon.png"></div>
+<div class="time">00:45:02</div>
+</body></html>

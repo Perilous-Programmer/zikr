@@ -1,0 +1,6 @@
+First release of Zikr Timer.
+• Interval and level countdown with a beep at the end of each level
+• Session history
+• English and Urdu (right-to-left)
+• Light and dark themes
+• Fully offline, no ads, no tracking

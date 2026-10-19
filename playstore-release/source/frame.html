@@ -1,0 +1,22 @@
+<!doctype html><html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;700&family=Noto+Nastaliq+Urdu:wght@600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;box-sizing:border-box}
+body{width:1080px;height:1920px;overflow:hidden;font-family:Outfit,sans-serif;display:flex;flex-direction:column;align-items:center}
+body.dark{background:linear-gradient(180deg,#1b1812,#0b0b0b 60%);color:#fff}
+body.light{background:linear-gradient(180deg,#efe6d6,#f5f6f8 60%);color:#1a1712}
+.cap{height:440px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:0 80px}
+h2{font-size:78px;font-weight:700;letter-spacing:-1px;line-height:1.08}
+.sub{margin-top:22px;font-size:38px;opacity:.7;font-weight:500}
+.ur h2,.ur .sub{font-family:'Noto Nastaliq Urdu';direction:rtl;line-height:1.9;letter-spacing:0}
+.ur h2{font-size:64px}
+.phone{width:730px;height:1424px;border-radius:72px;padding:18px;background:#1c1c1e;
+box-shadow:0 0 0 3px #c8ab7d66,0 40px 90px #0008}
+.phone img{width:694px;height:1388px;border-radius:56px;display:block}
+</style></head><body><div class="cap"><h2 id="t"></h2><div class="sub" id="s"></div></div>
+<div class="phone"><img id="i"></div>
+<script>
+const q=new URLSearchParams(location.search);
+document.body.className=q.get('theme')+(q.get('ur')?' ur':'');
+t.textContent=q.get('t');s.textContent=q.get('s');i.src=q.get('img');
+</script></body></html>

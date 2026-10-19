@@ -1,0 +1,23 @@
+Zikr Timer is a simple, distraction-free interval timer for zikr (dhikr). Choose how long each level lasts and how many levels you want. The app counts you through every level and plays a gentle beep when each one ends, so you can keep your eyes closed and your focus on remembrance.
+
+HOW IT WORKS
+• Set the interval in minutes and seconds.
+• Set the number of levels.
+• The total duration is calculated for you.
+• Press Start. A beep marks the end of each level.
+• Pause, resume or reset at any time.
+
+FEATURES
+• Level countdown: see the elapsed time, the current level and the total duration at a glance.
+• Gentle audio cue at the end of every level.
+• Session history: every completed or stopped session is saved with its date, interval, levels reached and total time.
+• English and Urdu: full Urdu interface with right-to-left layout.
+• Light and dark themes: an easy-on-the-eyes dark mode for night-time zikr.
+• Remembers your settings: your interval, levels, language and theme are kept for next time.
+
+PRIVATE BY DESIGN
+• No account, no sign-in.
+• No ads and no tracking.
+• Works fully offline. Your settings and history never leave your device.
+
+Whether you follow a daily wird, a set routine from your sheikh, or simply want a calm way to time your remembrance, Zikr Timer keeps the count so you don't have to.
